@@ -58,9 +58,7 @@ processWebhook execRestyler body = withRestyleMachine $ \mMachine ->
         lift $ cancelStaleJobs $ ajStaleJobs job
 
         logDebug $ "Executing Restyler for " <> display (jobPath acceptedJob)
-        withExceptT failure
-            $ success
-            <$> tryExecRestyler execRestyler job mMachine
+        eitherT failure success $ tryExecRestyler execRestyler job mMachine
 
 fromNotProcessed :: (HasLogFunc env, HasDB env) => JobNotProcessed -> RIO env ()
 fromNotProcessed = \case

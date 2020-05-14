@@ -15,6 +15,7 @@ module Restyled.Prelude
     , getByT
 
     -- * ExceptT
+    , eitherT
     , bimapMExceptT
 
     -- * Bufunctor
@@ -111,6 +112,10 @@ getEntityT = MaybeT . getEntity
 getByT
     :: (MonadIO m, SqlEntity a) => Unique a -> MaybeT (SqlPersistT m) (Entity a)
 getByT = MaybeT . getBy
+
+eitherT
+    :: Functor f => (e -> e') -> (a -> a') -> ExceptT e f a -> ExceptT e' f a'
+eitherT l r f = withExceptT l $ r <$> f
 
 bimapMExceptT
     :: Monad m => (e -> m f) -> (a -> m b) -> ExceptT e m a -> ExceptT f m b
