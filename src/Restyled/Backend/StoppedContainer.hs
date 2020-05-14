@@ -5,7 +5,6 @@ module Restyled.Backend.StoppedContainer
     , RunningContainer(..)
     , getRunningContainer
     , signalContainer
-    , signalContainerLogged
     )
 where
 
@@ -143,20 +142,3 @@ signalContainer
     -> m ExitCode
 signalContainer signal RunningContainer {..} =
     proc "docker" ["kill", "--signal", signal, rcContainerId] runProcess
-
-signalContainerLogged
-    :: ( MonadUnliftIO m
-       , MonadReader env m
-       , HasLogFunc env
-       , HasProcessContext env
-       )
-    => String
-    -> RunningContainer
-    -> m ()
-signalContainerLogged signal container = do
-    logDebug $ fromString signal <> " " <> display container
-    ec <- signalContainer signal container
-
-    case ec of
-        ExitSuccess -> logDebug "Success"
-        ExitFailure c -> logWarn $ "Non-zero exit:" <> displayShow c
